@@ -1,0 +1,26 @@
+0: iconst_0
+1: istore_1
+2: iload_1
+3: bipush        42
+5: idiv
+6: iload_0
+7: isub
+8: ifge          17
+11: iinc          1, 1
+14: goto          2
+17: iload_1
+18: ireturn
+
+
+2: v[1] = v[0] (1-2)
+
+v[0] = v[1] / 42
+v[1]++
+goto 2
+
+return v[1]
+
+
+for (int i = 0; i < 17; i++) {
+    
+}

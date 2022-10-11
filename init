@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $script_template = '#!/usr/bin/env bash
+
+javac {NAME}.java
+java -ea -jar {NAME}Test.jar Base';
+
+my $java_template = 'public class {CLASS} {
+    public static void main(String[] argv) {
+    }
+}';
+
+sub cur_hw {
+    my $cnt = 0;
+    foreach my $hw_dir (glob("./*")) {
+        $cnt++ if ($hw_dir =~ m/^\.\/\d+_\w+$/i);
+    }
+    return $cnt + 1;
+}
+
+my $hw_name = shift; # $ARGV[0]
+
+if ($hw_name eq '-h') {
+    print "\n\tUsage: ./init [howework name, 1 word, first letter must be uppercased]\n\n";
+    exit 0;
+}
+
+
+$script_template =~ s/\{NAME\}/$hw_name/g;
+$java_template =~ s/\{CLASS\}/$hw_name/g;
+
+my $real_dir = cur_hw() . "_$hw_name";
+mkdir $real_dir;
+
+my $script_path = "$real_dir/" . lc($hw_name) . ".sh";
+my $java_path = "$real_dir/$hw_name.java";
+system("echo '$script_template' > $script_path");
+system("echo '$java_template' > $java_path");
+system("chmod +x $script_path");

@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $code = "./";
+my $repo = "../repo/prog-intro/java-solutions";
+
+system("rm $repo/*");
+
+foreach my $java_file (glob("$code/*/*.java")) {
+    next if ($java_file =~ m/(stuff|1_RunMe)/);
+
+    my ($nm,) = ($java_file =~ m/\/(\w+\.java)/);
+    system("cp '$java_file' '$repo/$nm'");
+}

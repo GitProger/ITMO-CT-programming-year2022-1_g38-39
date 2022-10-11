@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $java_mask = "../repo/prog-intro/java-solutions/*.java";
+
+
+foreach my $java_file (glob($java_mask)) {
+    system("javac '$java_file' 2>/dev/null");
+    if (!$?) {
+    	print "Compilation error occured in: $java_file\n";
+    	exit 1;
+    }
+}
