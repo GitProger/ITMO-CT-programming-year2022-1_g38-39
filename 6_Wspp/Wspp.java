@@ -15,6 +15,7 @@ public class Wspp {
 
     private static void update(final Map<String, IntList> dictionary, String key) {
         var arr = dictionary.getOrDefault(key, new IntList());
+        occurrences++;
         arr.add(occurrences);
         dictionary.put(key, arr);
     }
@@ -29,7 +30,6 @@ public class Wspp {
                 st++;
             }
             if ((!good || i == arg.length() - 1) && cur != 0) {
-                occurrences++;
                 update(dictionary, arg.substring(st, st + cur));
                 cur = 0;
                 st = i + 1;

@@ -19,8 +19,13 @@ public class IntList {
     public void reserve(int sz) {
         int ln = array.length;
         if (ln < sz) {
-            array = Arrays.copyOf(array, ln + ln / 2 + 1);
+            array = Arrays.copyOf(array, sz + sz / 2 + 1);
         }
+    }
+
+    public void resize(int sz) {
+        reserve(sz);
+        length = sz;
     }
 
     public boolean add(int e) {
@@ -34,5 +39,19 @@ public class IntList {
 
     public int get(int i) {
         return array[i];
+    }
+
+    public void set(int i, int v) {
+        array[i] = v;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(array[i]);
+            if (i != length - 1) sb.append(" ");
+        }
+        return sb.toString();
     }
 }

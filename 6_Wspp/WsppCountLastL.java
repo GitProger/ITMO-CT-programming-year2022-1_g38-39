@@ -11,23 +11,32 @@ import java.io.PrintStream;
 
 public class WsppCountLastL {
     private static int occurrences = 0;
-    private static int localOccur = 0;
+    private static int curStr = 0;
+    private static int curOccur = 0;
 
     private static boolean isWordCharacter(char c) {
         return Character.isAlphabetic(c) || c == '\'' || Character.DASH_PUNCTUATION == Character.getType(c);
     }
 
-    private static void update(final Map<String, IntList> dictionary,
-                               final Map<String, ArrayList<IntList>> lastOc, final String key, int toPut) {
+    private static void update(final Map<String, IntList> dictionary, 
+                               final Map<String, IntList> lastOc, final String key) {
+        occurrences++;
+        curOccur++;
+
         var arr = dictionary.getOrDefault(key, new IntList());
-        arr.add(toPut);
+        arr.add(occurrences);
         dictionary.put(key, arr);
+
+        var oc = lastOc.getOrDefault(key, new IntList());
+        oc.resize(curStr + 1);
+        oc.set(curStr, curOccur);
+        lastOc.put(key, oc);
     }
 
     private static void consider(final Map<String, IntList> dictionary, 
                                  final Map<String, IntList> lastOc, final String arg) {
         int st = 0, cur = 0;
-        localOccur = 0;
+        curOccur = 0;
 
         for (int i = 0; i < arg.length(); i++) {
             boolean good = isWordCharacter(arg.charAt(i));
@@ -37,13 +46,12 @@ public class WsppCountLastL {
                 st++;
             }
             if ((!good || i == arg.length() - 1) && cur != 0) {
-                occurrences++;
-                localOccur++;
-                update(dictionary, lastOc, arg.substring(st, st + cur), occurrences);
+                update(dictionary, lastOc, arg.substring(st, st + cur));
                 cur = 0;
                 st = i + 1;
             }
         }
+        curStr++;
     }
 
     public static void main(String[] argv) {
@@ -53,12 +61,12 @@ public class WsppCountLastL {
         }
         try {
             Map<String, IntList> dictionary = new LinkedHashMap<>();
-            Map<String, ArrayList<IntList>> lastOc = new LinkedHashMap<>();
+            Map<String, IntList> lastOc = new LinkedHashMap<>();
 
             var input = new File(argv[0]);
             PrintStream out = new PrintStream(argv[1]);
-//            var input = System.in;
-//            var out = System.out;
+            //var input = System.in;
+            //var out = System.out;
 
             Scanner scan = new Scanner(input);
             while (scan.hasNextLine()) {
@@ -70,11 +78,19 @@ public class WsppCountLastL {
 
             for (Map.Entry<String, IntList> entry : list) {
                 String key = entry.getKey();
-                IntList arr = entry.getValue();
-                out.print(key + " " + arr.size() + " ");
+                out.print(key + " " + entry.getValue().size() + " ");
+                IntList oc = lastOc.get(key);
+                IntList ans = new IntList();
 
-                for (int i = 0; i < lastOc.get(key).size(); i++) {
-                    out.print(lastOc.get(key).get(i) + (i == lastOc.get(key).size() - 1 ? "" : " "));
+                for (int i = 0; i < oc.size(); i++) {
+                    if (oc.get(i) != 0) {
+                        ans.add(oc.get(i));
+                    }
+                }
+                for (int i = 0; i < ans.size(); i++) {
+                    if (ans.get(i) != 0) {
+                        out.print((i == 0 ? "" : " ") + ans.get(i));
+                    }
                 }
                 out.println();
 
@@ -88,4 +104,11 @@ public class WsppCountLastL {
         }
     }
 }
+
+/*
+To be, or not to be, that is the question:
+
+Monday's child is fair of face.
+Tuesday's child is full of grace.
+*/
 
