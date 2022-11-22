@@ -4,8 +4,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.IOException;
 import java.util.NoSuchElementException;
-import java.util.Map;
-import java.util.HashMap;
 
 public class Scanner {
     private final int BLOCK_SIZE = 4096; // debug 4
@@ -26,25 +24,30 @@ public class Scanner {
     public Scanner(Reader r) {
         stream = r;
     }
+
     public Scanner(InputStream is) {
         this(new InputStreamReader(is));
     }
+
     public Scanner(String input) {
         this(new StringReader(input));
     }
 
-    private boolean isDelimeter(char c) {
+    private boolean isDelimiter(char c) {
         return Character.isWhitespace(c);
     }
-    private boolean isDelimeter(char c, boolean lineFlag) {
+
+    private boolean isDelimiter(char c, boolean lineFlag) {
         if (lineFlag) {
-            return System.lineSeparator().indexOf(c) != -1;
+            return c == '\n';
+//            return System.lineSeparator().indexOf(c) != -1;
+//            return new String("\r\n").indexOf(c) != -1;
         } else {
-            return isDelimeter(c);
+            return isDelimiter(c);
         }
     }
 
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
     private String extractCache() {
         String local = cache;
         cache = null;
@@ -54,7 +57,7 @@ public class Scanner {
         noLongCache = true;
         return local;
     }
-    
+
     private int updateBuffer() throws IOException {
         if (pointer >= bufferLen) {
             pointer = 0;
@@ -69,7 +72,7 @@ public class Scanner {
 
         while (updateBuffer() != -1) {
             if (!lineFlag) {
-                while (token.length() == 0 && pointer < bufferLen && isDelimeter(buffer[pointer], lineFlag)) {
+                while (token.length() == 0 && pointer < bufferLen && isDelimiter(buffer[pointer], lineFlag)) {
                     pointer++;
                 }
             }
@@ -77,14 +80,16 @@ public class Scanner {
             boolean endFlag = false;
 
             while (tokenEnd < bufferLen) {
-                if (isDelimeter(buffer[tokenEnd], lineFlag)) {
+                if (buffer[tokenEnd] == '\r') tokenEnd++; // 
+                if (isDelimiter(buffer[tokenEnd], lineFlag)) { // :NOTE: one character separator
                     endFlag = true;
                     break;
                 }
                 tokenEnd++;
             }
 
-            token.append(buffer, pointer, tokenEnd - pointer);
+            boolean excess = lineFlag && (tokenEnd > pointer) && buffer[tokenEnd - 1] == '\r';
+            token.append(buffer, pointer, tokenEnd - (excess ? 1 : 0) - pointer); // лишний \r
             pointer = tokenEnd;
             if (lineFlag) {
                 pointer++;
@@ -99,7 +104,7 @@ public class Scanner {
         return token.length() != 0;
     }
 
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
     public boolean hasNext() {
         try {
             return staffHasNext(false);
@@ -107,6 +112,7 @@ public class Scanner {
             return false;
         }
     }
+
     public String next() {
         if (cache == null && !hasNext()) { //  noStringCache
             throw new NoSuchElementException();
@@ -121,13 +127,13 @@ public class Scanner {
             return false;
         }
     }
-    public String nextLine() { 
+
+    public String nextLine() {
         if (cache == null && !hasNextLine()) {
             throw new NoSuchElementException();
         }
         return extractCache();
     }
-
 
 
     public boolean hasNextLong() {
@@ -139,6 +145,7 @@ public class Scanner {
             return false;
         }
     }
+
     public long nextLong() {
         if (noLongCache && !hasNextLong()) {
             throw new NoSuchElementException();
@@ -153,10 +160,13 @@ public class Scanner {
             cacheInt = parseInt(next());
             noIntCache = false;
             return true;
-        } catch (RuntimeException e) {
+        } catch (NumberFormatException e) {
+            return false;
+        } catch (NoSuchElementException e) {
             return false;
         }
     }
+
     public int nextInt() {
         if (noIntCache && !hasNextInt()) {
             throw new NoSuchElementException();
@@ -166,23 +176,33 @@ public class Scanner {
         return t;
     }
 
-    private static long parseLong(String num) {
-        int radix = ((Character.toLowerCase(num.charAt(num.length() - 1)) == 'o') ? 8 : 10);
-        if (radix == 8) {
-            num = num.substring(0, num.length() - 1);
-        }
-        char[] s = new char[num.length()];
+    private static int getRadix(String num) {
+        return ((Character.toLowerCase(num.charAt(num.length() - 1)) == 'o') ? 8 : 10);
+    }
+
+    private static String goodString(String num, int radix) {
+        char[] s = new char[num.length() - (radix == 8 ? 1 : 0)];
 
         for (int i = 0; i < s.length; i++) {
             s[i] = num.charAt(i);
             if (!Character.isDigit(s[i]) && s[i] != '-') {
-                s[i] = (char)(s[i] - 'a' + '0');
+                s[i] = (char) (s[i] - 'a' + '0');
             }
         }
-        return Long.parseLong(new String(s), radix);
+        return new String(s);
+    }
+
+    private static long parseLong(String num) {
+        int radix = getRadix(num);
+        return Long.parseLong(goodString(num, radix), radix);
     }
 
     private static int parseInt(String num) {
-        return (int)parseLong(num);
+        int radix = getRadix(num);
+        if (radix == 8) {
+            return Integer.parseUnsignedInt(goodString(num, radix), radix); //!
+        } else {
+            return Integer.parseInt(goodString(num, radix), radix);
+        }
     }
 }

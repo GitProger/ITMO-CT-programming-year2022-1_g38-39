@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+cd "./out/production/7_Classes"
+
+java -ea -cp . markup/MarkupTest Base
+echo '=================================='
+java -ea -cp . markup/MarkupListTest TexList
+
+

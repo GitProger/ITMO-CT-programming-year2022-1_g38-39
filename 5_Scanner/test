@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+javac Scanner.java
+java Test.java
+

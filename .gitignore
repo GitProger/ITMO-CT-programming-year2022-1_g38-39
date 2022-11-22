@@ -17,4 +17,13 @@ gen
 *.gz
 *.toc
 
+# arch
+*.zip
+
+# Georgy's Stuff
+*/src/base/*
+*Tester.java
+*Test.java
+
+
 
