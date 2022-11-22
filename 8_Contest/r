@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+$s = uc shift;
+system "java $s.java";

@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+cd "./out/production/9_Md2Html" || echo "Dir not found"
+
+#java -ea -cp . md2html/Md2HtmlTest Base
+
+java -ea -cp . md2html/Md2HtmlTest Link

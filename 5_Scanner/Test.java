@@ -7,7 +7,7 @@ public class Test {
         System.out.println(scan.nextInt() + scan.nextInt() + scan.nextInt() + scan.nextInt());
     }
     private static void test2() {
-        Scanner scan = new Scanner(System.in);
+        Scanner scan = new Scanner("\n\rhi\r\nHello\r\n"); // System.in
         System.out.println(":"+scan.hasNextLine());
         System.out.println("Line1[" + scan.nextLine() + "]");
         System.out.println(":"+scan.hasNextLine());
@@ -47,11 +47,11 @@ public class Test {
     }
 
     public static void main(String[] argv) {
-  //      test2();
+        test2();
   //      test("\n\n");
-        Scanner scan = new Scanner(System.in);
-        while (scan.hasNextLine()) {
-            test(scan.nextLine());
-        }
+   //     Scanner scan = new Scanner(System.in);
+    //    while (scan.hasNextLine()) {
+     //       test(scan.nextLine());
+      //  }
     }
 }
