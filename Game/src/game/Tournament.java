@@ -55,7 +55,9 @@ public class Tournament {
             }
             String line = new String(new char[15]).replace("\0", "=");
             System.out.println(TerminalColors.RED + " " + line + " ROUND #" + t + " " + line + " " + TerminalColors.RESET);
-            System.out.println(TerminalColors.PURPLE + "Free player: " + rest + TerminalColors.RESET);
+            if (rest != 0) {
+                System.out.println(TerminalColors.PURPLE + "Free player: " + rest + TerminalColors.RESET);
+            }
             var used = new boolean[n + 1];
             for (int i = 1; i <= n; i++) {
                 for (int j = 1; j <= n; j++) {
