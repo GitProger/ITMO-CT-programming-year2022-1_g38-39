@@ -102,4 +102,9 @@ public class TicTacToeBoard implements Board, Position {
         }
         return sb.toString();
     }
+
+    @Override
+    public int getRowCnt() { return 3; }
+    @Override
+    public int getColCnt() { return 3; }
 }

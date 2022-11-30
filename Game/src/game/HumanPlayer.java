@@ -16,20 +16,39 @@ public class HumanPlayer implements Player {
         this(System.out, new Scanner(System.in));
     }
 
+    private int getCoordinate() {
+       while (true) {
+           try {
+               if (!in.hasNext()) continue;
+               if (in.hasNextInt()) {
+                   return in.nextInt();
+               } else {
+                   in.next();
+                   out.println("Bad number");
+               }
+           } catch (RuntimeException e) {
+               out.println("Error: " + e.getMessage());
+           }
+       }
+    }
+
     @Override
     public Move move(final Position position, final Cell cell) {
         while (true) {
-            out.println("Position");
+            out.println("Position:");
             out.println(position);
             out.println(cell + "'s move");
-            out.println("Enter row and column");
-            final Move move = new Move(in.nextInt(), in.nextInt(), cell);
+            out.print("Enter row and column -> ");
+            int r = getCoordinate();
+            int c = getCoordinate();
+            final Move move = new Move(r, c, cell);
             if (position.isValid(move)) {
                 return move;
             }
+
             final int row = move.getRow();
             final int column = move.getColumn();
-            out.println("Move " + move + " is invalid");
+            out.println("Move " + row + " " + column + " is invalid");
         }
     }
 }

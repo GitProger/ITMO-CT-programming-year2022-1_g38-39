@@ -1,6 +1,6 @@
 package game;
 
-public final class Move {
+public class Move {
     private final int row;
     private final int column;
     private final Cell value;
