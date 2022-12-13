@@ -16,7 +16,7 @@ public class Main {
     }
 
     private static void parseTest() {
-        TripleExpression e = new ExpressionParser().parse("((10 lcm 20) gcd (z lcm 30))");
+        TripleExpression e = new ExpressionParser().parse("reverse(-2147483648)");
         System.out.println(e);
         System.out.println(e.toMiniString());
         System.out.println(e.evaluate(1, 2, 3));
@@ -58,7 +58,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        parseTest();
+       // parseTest();
        // newFuncTest();
 
         if (args.length == 0) {

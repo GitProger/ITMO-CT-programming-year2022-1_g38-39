@@ -2,14 +2,13 @@ package expression;
 
 public class Reverse extends AbstractUnaryOperator {
     public static int reverse(int x) {
-        int c = x < 0 ? -1 : 1;
-        String s = new StringBuilder(String.valueOf(x * c)).reverse().toString();
+        long c = x < 0 ? -1L : 1L;
+        String s = new StringBuilder(String.valueOf(c * x)).reverse().toString();
         try {
-            return Integer.parseInt(s);
+            return (int)(c * Long.parseLong(s));
         } catch (RuntimeException e) {
-            System.err.println("Error: bad number in reverse; specific exception: " + e.getMessage());
-            e.printStackTrace();
-            return x * c;
+            System.err.println("Error: bad number `" + x + "` in reverse");
+            return (int)c * x;
         }
     }
 
