@@ -186,12 +186,13 @@ public class MDParser {
     }
 
     private String parse(String md) {
+        md = md.replace(System.lineSeparator(), "\n");
         md = md.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 
         var paragraphs = new ArrayList<Paragraph>();
         var parted = md.split("[" + System.lineSeparator() + "]{2,}"); // System.lineSeparator() + System.lineSeparator()
         for (String paragraphSource : Arrays.stream(parted).filter(s -> !s.trim().isEmpty()).toArray(String[]::new)) {
-            paragraphs.add(parseHeader(paragraphSource.replaceFirst("^[\\r\\n]++", "").replaceFirst("\\s++$", ""))); // remove \n from end
+            paragraphs.add(parseHeader(paragraphSource.replaceFirst("^[\\n]++", "").replaceFirst("\\s++$", ""))); // remove \n from end
         }
 
         return new HTMLDocument(paragraphs).toHTML().replace("\\*", "*").replace("\\_", "_");

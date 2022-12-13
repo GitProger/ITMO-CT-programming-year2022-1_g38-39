@@ -36,6 +36,7 @@ public class Md2Html {
         } catch (IOException e) {
             System.out.println("Unhandled error");
             e.printStackTrace();
+            e.printStackTrace();
         }
     }
 

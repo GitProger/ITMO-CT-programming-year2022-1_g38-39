@@ -2,8 +2,10 @@ package expression;
 
 public class Variable implements CommonExpression {
     private final String name;
-    String getName() { return name; }
-    Variable(String name) { this.name = name; }
+    public Variable(String name) { this.name = name; }
+
+    public String getName() { return name; }
+
     @Override
     public int evaluate(int x) { return x; }
     @Override
@@ -23,4 +25,15 @@ public class Variable implements CommonExpression {
     public String toString() { return  name; }
     @Override
     public String toMiniString() { return name; }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Variable that)) return false;
+        return name.equals(that.name);
+    }
 }
