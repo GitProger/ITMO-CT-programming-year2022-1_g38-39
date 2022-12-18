@@ -1,15 +1,18 @@
 package expression.parser;
+
 import expression.*;
+import expression.exceptions.*;
 
 public class TripleExpressionParser extends BaseParser {
     private String src;
+
     public TripleExpressionParser(String source) {
         super(new StringSource(source));
         src = source;
     }
 
     private void skipWhitespace() {
-        while (between((char)1, (char)32) || between((char)128, (char)Character.MAX_CODE_POINT)) {
+        while (between((char) 1, (char) 32) || between((char) 128, (char) Character.MAX_CODE_POINT)) {
             take();
         }
     }
@@ -29,6 +32,7 @@ public class TripleExpressionParser extends BaseParser {
         REV,
         END
     }
+
     private Type curType = Type.END;
     private int num = 0;
     private String variable = "";
@@ -56,21 +60,26 @@ public class TripleExpressionParser extends BaseParser {
 
     private void getToken() {
         skipWhitespace();
-        if (take('\0') || eof()) { curType = Type.END; }
-        else if (take('(')) { curType = Type.LBR; }
-        else if (take(')')) { curType = Type.RBR; }
-        else if (take('*')) { curType = Type.MUL; }
-        else if (take('/')) { curType = Type.DIV; }
-        else if (take('+')) { curType = Type.ADD; }
-        else if (take('-')) {
+        if (take('\0') || eof()) {
+            curType = Type.END;
+        } else if (take('(')) {
+            curType = Type.LBR;
+        } else if (take(')')) {
+            curType = Type.RBR;
+        } else if (take('*')) {
+            curType = Type.MUL;
+        } else if (take('/')) {
+            curType = Type.DIV;
+        } else if (take('+')) {
+            curType = Type.ADD;
+        } else if (take('-')) {
             var prev = curType;
             curType = Type.SUB;
             if (prev != Type.NUM && prev != Type.VAR && prev != Type.RBR && between('0', '9')) {
                 curType = Type.NUM;
                 parseNumber("-");
             }
-        }
-        else if (between('x', 'z')) {
+        } else if (between('x', 'z')) {
             curType = Type.VAR;
             variable = String.valueOf(take());
         } else if (between('0', '9')) {
@@ -86,7 +95,7 @@ public class TripleExpressionParser extends BaseParser {
     }
 
 
-    CommonExpression prim(boolean get) {
+    CommonExpression prim(boolean get, boolean checkedOperations) {
         if (get) {
             getToken();
         }
@@ -103,9 +112,11 @@ public class TripleExpressionParser extends BaseParser {
                 return v;
             }
             case SUB:
-                return new Negate(prim(true));
+                return (checkedOperations
+                        ? new CheckedNegate(prim(true, checkedOperations))
+                        : new Negate(prim(true, checkedOperations)));
             case LBR: {
-                CommonExpression e = numther(true); // expr
+                CommonExpression e = numther(true, checkedOperations); // expr
                 if (curType != Type.RBR) {
                     throw error("')' expected");
                 }
@@ -113,51 +124,59 @@ public class TripleExpressionParser extends BaseParser {
                 return e;
             }
             case REV: //
-                return new Reverse(prim(true));
+                return new Reverse(prim(true, checkedOperations));
             default:
                 throw error("primary expression expected, got: " + curType + " in `" + src + "`");
         }
     }
 
-    CommonExpression term(boolean get) {
-        CommonExpression left = prim(get);
+    CommonExpression term(boolean get, boolean checkedOperations) {
+        CommonExpression left = prim(get, checkedOperations);
         while (true) {
             if (curType == Type.MUL) {
-                left = new Multiply(left, prim(true));
+                left = (checkedOperations
+                        ? new CheckedMultiply(left, prim(true, checkedOperations))
+                        : new Multiply(left, prim(true, checkedOperations)));
             } else if (curType == Type.DIV) {
-                left = new Divide(left, prim(true));
+                left = (checkedOperations
+                        ? new CheckedDivide(left, prim(true, checkedOperations))
+                        : new Divide(left, prim(true, checkedOperations)));
             } else
                 return left;
         }
     }
 
-    CommonExpression expr(boolean get) {
-        CommonExpression left = term(get);
+    CommonExpression expr(boolean get, boolean checkedOperations) {
+        CommonExpression left = term(get, checkedOperations);
         while (true) {
             if (curType == Type.ADD) {
-                left = new Add(left, term(true));
+                left = (checkedOperations
+                        ? new CheckedAdd(left, term(true, checkedOperations))
+                        : new Add(left, term(true, checkedOperations)));
             } else if (curType == Type.SUB) {
-                left = new Subtract(left, term(true));
+                left = (checkedOperations
+                        ? new CheckedSubtract(left, term(true, checkedOperations))
+                        : new Subtract(left, term(true, checkedOperations)));
             } else
                 return left;
         }
     }
 
-    CommonExpression numther(boolean get) {
-        CommonExpression left = expr(get);
+    CommonExpression numther(boolean get, boolean checkedOperations) {
+        CommonExpression left = expr(get, checkedOperations);
         while (true) {
             if (curType == Type.GCD) {
-                left = new Gcd(left, expr(true));
+                left = new Gcd(left, expr(true, checkedOperations));
             } else if (curType == Type.LCM) {
-                left = new Lcm(left, expr(true));
+                left = new Lcm(left, expr(true, checkedOperations));
             } else
                 return left;
         }
     }
 
-    public TripleExpression parse() {
+    public TripleExpression parse(boolean checkedOperations) {
         if (src.trim().isEmpty()) return new Const(0);
         getToken();
-        return numther(false);
+        return numther(false, checkedOperations);
     }
 }

@@ -8,6 +8,10 @@ public class CheckedAdd extends Add {
 
     @Override
     public int evaluate(int x, int y, int z) { // only  TripleExpression required
-        return left.evaluate(x, y, z) + right.evaluate(x, y, z);
+        int lVal = left.evaluate(x, y, z);
+        int rVal = right.evaluate(x, y, z);
+        int res = lVal + rVal;
+        if (((lVal & rVal & ~res) | (~lVal & ~rVal & res)) < 0) throw new ArithmeticException("overflow");
+        return res;
     }
 }

@@ -8,6 +8,8 @@ public class CheckedNegate extends Negate {
 
     @Override
     public int evaluate(int x, int y, int z) {
-        return -expr.evaluate(x, y, z);
+        int tmp = expr.evaluate(x, y, z);
+        if (tmp == Integer.MIN_VALUE) throw new ArithmeticException("overflow");
+        return -tmp;
     }
 }
