@@ -7,7 +7,7 @@ public class Gcd extends AbstractBinaryOperator {
     }
 
     public Gcd(CommonExpression a, CommonExpression b) {
-        super(a, b, Gcd::gcd, (x, y) -> (double) gcd((int) Math.round(x), (int) Math.round(y)));
+        super(a, b);
     }
 
     @Override
@@ -23,7 +23,22 @@ public class Gcd extends AbstractBinaryOperator {
     @Override
     protected boolean needRightBracket() {
         if (right instanceof Gcd) return false;
-//        if ((right instanceof Gcd || right instanceof Lcm)) return false;
         return super.needRightBracket();
+    }
+
+
+    @Override
+    public double evaluate(double x) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int evaluate(int x) {
+        return gcd(left.evaluate(x), right.evaluate(x));
+    }
+
+    @Override
+    public int evaluate(int x, int y, int z) {
+        return gcd(left.evaluate(x, y, z), right.evaluate(x, y, z));
     }
 }

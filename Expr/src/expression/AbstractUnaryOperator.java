@@ -1,17 +1,12 @@
 package expression;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 public abstract class AbstractUnaryOperator implements CommonExpression { // prefix
     protected final CommonExpression expr;
-    protected final Function<Integer, Integer> operatorInt;
-    protected final Function<Double, Double> operatorDouble;
 
-    public AbstractUnaryOperator(CommonExpression expr, Function<Integer, Integer> opI, Function<Double, Double> opD) {
+    public AbstractUnaryOperator(CommonExpression expr) {
         this.expr = expr;
-        this.operatorInt = opI;
-        this.operatorDouble = opD;
     }
 
     public abstract int priority();
@@ -19,19 +14,13 @@ public abstract class AbstractUnaryOperator implements CommonExpression { // pre
     public abstract String getOperatorName();
 
     @Override
-    public double evaluate(double x) {
-        return operatorDouble.apply(expr.evaluate(x));
-    }
+    public abstract double evaluate(double x);
 
     @Override
-    public int evaluate(int x) {
-        return operatorInt.apply(expr.evaluate(x));
-    }
+    public abstract int evaluate(int x);
 
     @Override
-    public int evaluate(int x, int y, int z) {
-        return operatorInt.apply(expr.evaluate(x, y, z));
-    }
+    public abstract int evaluate(int x, int y, int z);
 
     @Override
     public boolean equals(Object o) {

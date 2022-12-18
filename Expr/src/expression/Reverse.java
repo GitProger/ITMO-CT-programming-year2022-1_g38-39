@@ -13,7 +13,7 @@ public class Reverse extends AbstractUnaryOperator {
     }
 
     public Reverse(CommonExpression expr) {
-        super(expr, Reverse::reverse, x -> (double) reverse((int) Math.round(x)));
+        super(expr);
     }
 
     @Override
@@ -25,4 +25,20 @@ public class Reverse extends AbstractUnaryOperator {
     public int priority() {
         return 3;
     }
+
+    @Override
+    public double evaluate(double x) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int evaluate(int x) {
+        return reverse(expr.evaluate(x));
+    }
+
+    @Override
+    public int evaluate(int x, int y, int z) {
+        return reverse(expr.evaluate(x, y, z));
+    }
+
 }

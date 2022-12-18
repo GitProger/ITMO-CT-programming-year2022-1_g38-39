@@ -5,14 +5,10 @@ import java.util.function.BiFunction;
 
 public abstract class AbstractBinaryOperator implements CommonExpression {
     protected final CommonExpression left, right;
-    protected final BiFunction<Integer, Integer, Integer> operatorInt;
-    protected final BiFunction<Double, Double, Double> operatorDouble;
 
-    public AbstractBinaryOperator(CommonExpression left, CommonExpression right, BiFunction<Integer, Integer, Integer> opI, BiFunction<Double, Double, Double> opD) {
+    public AbstractBinaryOperator(CommonExpression left, CommonExpression right) {
         this.left = left;
         this.right = right;
-        this.operatorInt = opI;
-        this.operatorDouble = opD;
     }
 
     public abstract int priority();
@@ -20,19 +16,13 @@ public abstract class AbstractBinaryOperator implements CommonExpression {
     public abstract String getOperatorName();
 
     @Override
-    public double evaluate(double x) {
-        return operatorDouble.apply(left.evaluate(x), right.evaluate(x));
-    }
+    public abstract double evaluate(double x);
 
     @Override
-    public int evaluate(int x) {
-        return operatorInt.apply(left.evaluate(x), right.evaluate(x));
-    }
+    public abstract int evaluate(int x);
 
     @Override
-    public int evaluate(int x, int y, int z) {
-        return operatorInt.apply(left.evaluate(x, y, z), right.evaluate(x, y, z));
-    }
+    public abstract int evaluate(int x, int y, int z);
 
     @Override
     public boolean equals(Object o) {

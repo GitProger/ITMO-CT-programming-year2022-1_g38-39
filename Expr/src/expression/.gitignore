@@ -1,0 +1,29 @@
+# java files
+*.class
+*.jar
+
+# test files
+*.in
+*.out
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+# LaTex Output
+*.log
+*.aux
+*.gz
+*.toc
+
+# arch
+*.zip
+
+# Georgy's Stuff
+*/src/base/*
+*Tester.java
+*Test.java
+
+
+
