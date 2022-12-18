@@ -2,43 +2,6 @@ package expression;
 import expression.parser.*;
 
 public class Main {
-    private static void unaryMinusTest() {
-        var a = new Negate(new Add(
-                new Negate(new Const(10)),
-                new Const(20)
-        ));
-        System.out.println(a);
-        System.out.println(a.toMiniString());
-
-        var b = new Negate(new Const(1));
-        System.out.println(b);
-        System.out.println(b.toMiniString());
-    }
-
-    private static void parseTest() {
-        TripleExpression e = new ExpressionParser().parse("reverse(-2147483648)");
-        System.out.println(e);
-        System.out.println(e.toMiniString());
-        System.out.println(e.evaluate(1, 2, 3));
-    }
-
-    private static void newFuncTest() {
-        var e = new Gcd(new Lcm(new Const(20), new Const(120)), new Lcm(new Const(2), new Const(3)));
-        System.out.println(e);
-        System.out.println(e.toMiniString());
-        System.out.println(e.evaluate(0));
-
-        var f = new Lcm(new Gcd(new Lcm(new Const(20), new Const(120)), new Const(2)), new Const(3));
-        System.out.println(f);
-        System.out.println(f.toMiniString());
-        System.out.println(f.evaluate(0));
-
-        var g = new Lcm(new Const(20), new Gcd(new Const(120), new Lcm(new Const(2), new Const(3))));
-        System.out.println(g);
-        System.out.println(g.toMiniString());
-        System.out.println(g.evaluate(0));
-    }
-
     public static int parabola(int x) {
         var expr = new Add(
                 new Subtract(
@@ -57,10 +20,22 @@ public class Main {
         return expr.evaluate(x);
     }
 
-    public static void main(String[] args) {
-       // parseTest();
-       // newFuncTest();
+    public static void errors() {
+        var expr = new ExpressionParser().parse("1000000*x*x*x*x*x/(x-1)");
+        System.out.printf("%c%8c\n", 'x', 'f');
+        for (int x = 0; x <= 10; x++) {
+            String res = "";
+            try {
+                res = Integer.toString(expr.evaluate(x, 0, 0));
+            } catch (ArithmeticException e) {
+                res = e.getMessage();
+            }
+            System.out.printf("%-8d%s\n", x, res);
+        }
+    }
 
+    public static void main(String[] args) {
+        errors();
         if (args.length == 0) {
             System.out.println("No input integer provided.");
             return;
