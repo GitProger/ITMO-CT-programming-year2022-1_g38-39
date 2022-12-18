@@ -3,14 +3,14 @@ import expression.parser.*;
 
 public class Main {
     private static void unaryMinusTest() {
-        var a = new UnaryMinus(new Add(
-                new UnaryMinus(new Const(10)),
+        var a = new Negate(new Add(
+                new Negate(new Const(10)),
                 new Const(20)
         ));
         System.out.println(a);
         System.out.println(a.toMiniString());
 
-        var b = new UnaryMinus(new Const(1));
+        var b = new Negate(new Const(1));
         System.out.println(b);
         System.out.println(b.toMiniString());
     }

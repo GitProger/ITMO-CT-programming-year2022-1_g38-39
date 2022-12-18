@@ -1,7 +1,7 @@
 package expression;
 
-public class UnaryMinus extends AbstractUnaryOperator {
-    public UnaryMinus(CommonExpression expr) {
+public class Negate extends AbstractUnaryOperator {
+    public Negate(CommonExpression expr) {
         super(expr);
     }
 

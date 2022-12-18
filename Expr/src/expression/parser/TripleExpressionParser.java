@@ -103,7 +103,7 @@ public class TripleExpressionParser extends BaseParser {
                 return v;
             }
             case SUB:
-                return new UnaryMinus(prim(true));
+                return new Negate(prim(true));
             case LBR: {
                 CommonExpression e = numther(true); // expr
                 if (curType != Type.RBR) {
