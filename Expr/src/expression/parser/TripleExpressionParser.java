@@ -4,7 +4,7 @@ import expression.*;
 import expression.exceptions.*;
 
 public class TripleExpressionParser extends BaseParser {
-    private String src;
+    private final String src;
 
     public TripleExpressionParser(String source) {
         super(new StringSource(source));
@@ -51,11 +51,7 @@ public class TripleExpressionParser extends BaseParser {
         } else {
             throw error("Invalid number");
         }
-        try {
-            num = Integer.parseInt(sb.toString());
-        } catch (RuntimeException e) {
-            System.err.println("Bad number `" + sb + "`");
-        }
+        num = Integer.parseInt(sb.toString());
     }
 
     private void getToken() {
@@ -177,6 +173,8 @@ public class TripleExpressionParser extends BaseParser {
     public TripleExpression parse(boolean checkedOperations) {
         if (src.trim().isEmpty()) return new Const(0);
         getToken();
-        return numther(false, checkedOperations);
+        var r = numther(false, checkedOperations);
+        if (curType != Type.END) throw error("Unexpected character");
+        return r;
     }
 }
