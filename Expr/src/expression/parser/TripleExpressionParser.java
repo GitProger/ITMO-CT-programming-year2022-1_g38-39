@@ -11,21 +11,28 @@ public class TripleExpressionParser extends BaseParser {
         src = source;
     }
 
+    private boolean isWhitespace() {
+        return between((char) 1, (char) 32) || between((char) 128, (char) Character.MAX_CODE_POINT);
+    }
+
     private void skipWhitespace() {
-        while (between((char) 1, (char) 32) || between((char) 128, (char) Character.MAX_CODE_POINT )) {
+        while (isWhitespace()) {
             take();
         }
     }
 
     private boolean take(String s) {
-        if (!take(s.charAt(0))) return false;
-        expect(s.substring(1));
+        for (char c : s.toCharArray()) {
+            if (!take(c)) {
+                return false;
+            }
+        }
         return true;
     }
 
-    private void verify() {
-        if (!test(' ') && !test('(')) {
-            throw error("Separator expected");
+    private void verifyFunction() {
+        if (!isWhitespace() && !test('(') && !test('-')) {
+            throw error("Separator expected (space, '(' or '-')");
         }
     }
 
@@ -90,19 +97,21 @@ public class TripleExpressionParser extends BaseParser {
             parseNumber("");
         } else if (take("reverse")) {
             curType = Type.REV;
-            verify();
+            verifyFunction();
         } else if (take("gcd")) {
             curType = Type.GCD;
-            verify();
-        } else if (take("lcm")) {
-            curType = Type.LCM;
-            verify();
-        } else if (take("log10")) {
-            curType = Type.LOG10;
-            verify();
+            verifyFunction();
+        } else if (take("l")) {
+            if (take("cm")) {
+                curType = Type.LCM;
+                verifyFunction();
+            } else if (take("og10")) {
+                curType = Type.LOG10;
+                verifyFunction();
+            }
         } else if (take("pow10")) {
             curType = Type.POW10;
-            verify();
+            verifyFunction();
         }
     }
 
@@ -115,11 +124,13 @@ public class TripleExpressionParser extends BaseParser {
                 getToken();
                 return v;
             }
+
             case VAR: {
                 CommonExpression v = new Variable(variable);
                 getToken();
                 return v;
             }
+
             case SUB:
                 return (checkedOperations
                         ? new CheckedNegate(prim(checkedOperations))
@@ -142,10 +153,12 @@ public class TripleExpressionParser extends BaseParser {
                 getToken();
                 return e;
             }
+
             case REV: //
                 return (checkedOperations
                         ? new CheckedReverse(prim(checkedOperations))
                         : new Reverse(prim(checkedOperations)));
+
             default:
                 throw error("primary expression expected, got: " + curType + " in `" + src + "`");
         }

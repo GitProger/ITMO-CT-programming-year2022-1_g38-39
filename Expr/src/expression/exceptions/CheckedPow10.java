@@ -4,6 +4,7 @@ import expression.*;
 public class CheckedPow10 extends Pow10 {
     @Override
     protected int iPow10(int x) {
+        if (x < 0) throw new ArithmeticException("power of a non-positive number is not allowed");
         int ans = 1;
         while (x > 0) {
             x--;

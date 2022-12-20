@@ -2,8 +2,11 @@ package expression;
 
 public class Log10 extends AbstractUnaryOperator {
     protected int iLog10(int x) {
+        if (x <= 0) {
+            throw new ArithmeticException("logarithm of a negative number");
+        }
         int ans = 0;
-        while (x > 0) {
+        while (x >= 10) {
             x /= 10;
             ans++;
         }
@@ -21,7 +24,7 @@ public class Log10 extends AbstractUnaryOperator {
 
     @Override
     public int priority() {
-        return 0;
+        return 4;
     }
 
     @Override

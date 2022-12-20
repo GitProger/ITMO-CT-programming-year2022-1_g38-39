@@ -2,6 +2,7 @@ package expression;
 
 public class Pow10 extends AbstractUnaryOperator {
     protected int iPow10(int x) {
+        if (x < 0) return 0;
         int ans = 1;
         while (x > 0) {
             x--;
@@ -21,7 +22,7 @@ public class Pow10 extends AbstractUnaryOperator {
 
     @Override
     public int priority() {
-        return 0;
+        return 4;
     }
 
     @Override
