@@ -1,7 +1,7 @@
 package expression;
 
 public class Reverse extends AbstractUnaryOperator {
-    public static int reverse(int x) {
+    protected int reverse(int x) {
         long c = x < 0 ? -1L : 1L;
         String s = new StringBuilder(String.valueOf(c * x)).reverse().toString();
         try {

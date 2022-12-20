@@ -5,10 +5,9 @@ public class Lcm extends AbstractBinaryOperator {
     public static int lcm(int a, int b) {
         int g = Gcd.gcd(a, b);
         if (g == 0) {
-           // System.err.println("lcm(0, 0) is incorrect, considering lcm(0, 0) = 0");
             return 0;
         }
-        return (int)((long)a * (long)b / g);
+        return a * (b / g);
     }
 
     public Lcm(CommonExpression a, CommonExpression b) {

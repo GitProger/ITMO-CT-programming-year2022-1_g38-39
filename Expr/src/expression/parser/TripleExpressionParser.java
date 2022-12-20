@@ -12,20 +12,27 @@ public class TripleExpressionParser extends BaseParser {
     }
 
     private void skipWhitespace() {
-        while (between((char) 1, (char) 32) || between((char) 128, (char) Character.MAX_CODE_POINT)) {
+        while (between((char) 1, (char) 32) || between((char) 128, (char) Character.MAX_CODE_POINT )) {
             take();
         }
     }
 
-    private boolean take(String s) { //
+    private boolean take(String s) {
         if (!take(s.charAt(0))) return false;
         expect(s.substring(1));
         return true;
     }
 
+    private void verify() {
+        if (!test(' ') && !test('(')) {
+            throw error("Separator expected");
+        }
+    }
+
     private enum Type {
         NUM, VAR,
         LBR, RBR,
+        POW10, LOG10,
         MUL, DIV,
         ADD, SUB,
         GCD, LCM,
@@ -81,21 +88,27 @@ public class TripleExpressionParser extends BaseParser {
         } else if (between('0', '9')) {
             curType = Type.NUM;
             parseNumber("");
-        } else if (take("reverse")) { //
+        } else if (take("reverse")) {
             curType = Type.REV;
-        } else if (take("gcd")) { //
+            verify();
+        } else if (take("gcd")) {
             curType = Type.GCD;
-        } else if (take("lcm")) { //
+            verify();
+        } else if (take("lcm")) {
             curType = Type.LCM;
+            verify();
+        } else if (take("log10")) {
+            curType = Type.LOG10;
+            verify();
+        } else if (take("pow10")) {
+            curType = Type.POW10;
+            verify();
         }
     }
 
 
-    CommonExpression prim(boolean get, boolean checkedOperations) {
-        if (get) {
-            getToken();
-        }
-
+    CommonExpression prim(boolean checkedOperations) {
+        getToken();
         switch (curType) {
             case NUM: {
                 CommonExpression v = new Const(num);
@@ -109,10 +122,20 @@ public class TripleExpressionParser extends BaseParser {
             }
             case SUB:
                 return (checkedOperations
-                        ? new CheckedNegate(prim(true, checkedOperations))
-                        : new Negate(prim(true, checkedOperations)));
+                        ? new CheckedNegate(prim(checkedOperations))
+                        : new Negate(prim(checkedOperations)));
+
+            case POW10:
+                return (checkedOperations
+                        ? new CheckedPow10(prim(checkedOperations))
+                        : new Pow10(prim(checkedOperations)));
+            case LOG10:
+                return (checkedOperations
+                        ? new CheckedLog10(prim(checkedOperations))
+                        : new Log10(prim(checkedOperations)));
+
             case LBR: {
-                CommonExpression e = numther(true, checkedOperations); // expr
+                CommonExpression e = numther(checkedOperations); // expr
                 if (curType != Type.RBR) {
                     throw error("')' expected");
                 }
@@ -120,60 +143,67 @@ public class TripleExpressionParser extends BaseParser {
                 return e;
             }
             case REV: //
-                return new Reverse(prim(true, checkedOperations));
+                return (checkedOperations
+                        ? new CheckedReverse(prim(checkedOperations))
+                        : new Reverse(prim(checkedOperations)));
             default:
                 throw error("primary expression expected, got: " + curType + " in `" + src + "`");
         }
     }
 
-    CommonExpression term(boolean get, boolean checkedOperations) {
-        CommonExpression left = prim(get, checkedOperations);
+    CommonExpression term(boolean checkedOperations) {
+        CommonExpression left = prim(checkedOperations);
         while (true) {
             if (curType == Type.MUL) {
                 left = (checkedOperations
-                        ? new CheckedMultiply(left, prim(true, checkedOperations))
-                        : new Multiply(left, prim(true, checkedOperations)));
+                        ? new CheckedMultiply(left, prim(checkedOperations))
+                        : new Multiply(left, prim(checkedOperations)));
             } else if (curType == Type.DIV) {
                 left = (checkedOperations
-                        ? new CheckedDivide(left, prim(true, checkedOperations))
-                        : new Divide(left, prim(true, checkedOperations)));
-            } else
+                        ? new CheckedDivide(left, prim(checkedOperations))
+                        : new Divide(left, prim(checkedOperations)));
+            } else {
                 return left;
+            }
         }
     }
 
-    CommonExpression expr(boolean get, boolean checkedOperations) {
-        CommonExpression left = term(get, checkedOperations);
+    CommonExpression expr(boolean checkedOperations) {
+        CommonExpression left = term(checkedOperations);
         while (true) {
             if (curType == Type.ADD) {
                 left = (checkedOperations
-                        ? new CheckedAdd(left, term(true, checkedOperations))
-                        : new Add(left, term(true, checkedOperations)));
+                        ? new CheckedAdd(left, term(checkedOperations))
+                        : new Add(left, term(checkedOperations)));
             } else if (curType == Type.SUB) {
                 left = (checkedOperations
-                        ? new CheckedSubtract(left, term(true, checkedOperations))
-                        : new Subtract(left, term(true, checkedOperations)));
-            } else
+                        ? new CheckedSubtract(left, term(checkedOperations))
+                        : new Subtract(left, term(checkedOperations)));
+            } else {
                 return left;
+            }
         }
     }
 
-    CommonExpression numther(boolean get, boolean checkedOperations) {
-        CommonExpression left = expr(get, checkedOperations);
+    CommonExpression numther(boolean checkedOperations) {
+        CommonExpression left = expr(checkedOperations);
         while (true) {
             if (curType == Type.GCD) {
-                left = new Gcd(left, expr(true, checkedOperations));
+                left = (checkedOperations
+                        ? new CheckedGcd(left, expr(checkedOperations))
+                        : new Gcd(left, expr(checkedOperations)));
             } else if (curType == Type.LCM) {
-                left = new Lcm(left, expr(true, checkedOperations));
-            } else
+                left = (checkedOperations
+                        ? new CheckedLcm(left, expr(checkedOperations))
+                        : new Lcm(left, expr(checkedOperations)));
+            } else {
                 return left;
+            }
         }
     }
 
     public TripleExpression parse(boolean checkedOperations) {
-        if (src.trim().isEmpty()) return new Const(0);
-        getToken();
-        var r = numther(false, checkedOperations);
+        var r = numther(checkedOperations);
         if (curType != Type.END) {
             if (curType == Type.RBR) {
                 throw error("Unopened ')'");
