@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.LongBinaryOperator;
 
-import expression.parser.ExpressionParser; // added
-
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
