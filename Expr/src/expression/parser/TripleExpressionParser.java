@@ -174,7 +174,12 @@ public class TripleExpressionParser extends BaseParser {
         if (src.trim().isEmpty()) return new Const(0);
         getToken();
         var r = numther(false, checkedOperations);
-        if (curType != Type.END) throw error("Unexpected character");
+        if (curType != Type.END) {
+            if (curType == Type.RBR) {
+                throw error("Unopened ')'");
+            }
+            throw error("Unexpected character");
+        }
         return r;
     }
 }
